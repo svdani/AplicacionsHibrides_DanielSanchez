@@ -17,7 +17,7 @@ json_keyboard1 = json.dumps({'keyboard': [["Piedra"],["Papel"],["Tijera"],["Laga
 							'resize_keyboard':True})
 #\Funcionamient juego
 
-def tiradaComputer(argument):
+def tiradaComputer(plyer, argument):
 	switcher = {
         1: "Piedra",
         2: "Papel",
@@ -29,21 +29,109 @@ def tiradaComputer(argument):
 	movPc = switcher.get(argument)
 	print movPc
 
+	print plyer
+	if str(plyer) == movPc:
+		print "Empate"
+
+	elif str(plyer) == "Piedra":
+		if movPc == "Papel":
+			print "Has perdido"
+		elif movPc == "Tijera":
+			print "Has ganado"
+		elif movPc == "Lagarto":
+			print "Has ganado"
+		elif movPc == "Spock":
+			print "Has perdido"
+
+	elif str(plyer) == "Papel":
+		if movPc == "Piedra":
+			print "Has ganado"
+		elif movPc == "Tijera":
+			print "Has perdido"
+		elif movPc == "Lagarto":
+			print "Has perdido"
+		elif movPc == "Spock":
+			print "Has ganado"
+
+	elif str(plyer) == "Tijera":
+		if movPc == "Piedra":
+			print "Has perdido"
+		elif movPc == "Papel":
+			print "Has ganado"
+		elif movPc == "Lagarto":
+			print "Has ganado"
+		elif movPc == "Spock":
+			print "Has perdido"
+
+	elif str(plyer) == "Lagarto":
+		if movPc == "Papel":
+			print "Has ganado"
+		elif movPc == "Tijera":
+			print "Has perdido"
+		elif movPc == "Piedra":
+			print "Has perdido"
+		elif movPc == "Spock":
+			print "Has ganado"
+
+	elif str(plyer) == "Spock":
+		if movPc == "Piedra":
+			print "Has ganado"
+		elif movPc == "Papel":
+			print "Has perdido"
+		elif movPc == "Lagarto":
+			print "Has perdido"
+		elif movPc == "Tijera":
+			print "Has ganado"
+
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
 	bot.send_message(message.chat.id, "Bienvenido, Estas listo? ",reply_markup=json_keyboard)
 #\nEmpieza el juego \nPiedra, Papel, Tijera, Lagarto, Spock...""
 
+#\Opciones
+@bot.message_handler(regexp='Piedra')
+def elije(message):
+
+	computer = randrange(1, 6)
+	tiradaComputer(message.text,computer)
+
+@bot.message_handler(regexp='Papel')
+def elije(message):
+
+	computer = randrange(1, 6)
+	tiradaComputer(message.text,computer)
+
+@bot.message_handler(regexp='Tijera')
+def elije(message):
+
+	computer = randrange(1, 6)
+	tiradaComputer(message.text,computer)
+
+@bot.message_handler(regexp='Lagarto')
+def elije(message):
+
+	computer = randrange(1, 6)
+	tiradaComputer(message.text,computer)
+
+@bot.message_handler(regexp='Spock')
+def elije(message):
+
+	computer = randrange(1, 6)
+	tiradaComputer(message.text,computer)
+
 
 @bot.message_handler(func=lambda message:True)
 def empiezaPartida(message):
-		if str(message.text) == str("Si"):
-			bot.send_message(message.chat.id, "Empieza el juego \nPiedra, Papel, Tijera, Lagarto, Spock...",reply_markup=json_keyboard1)
-			computer = randrange(1, 6)
-			tiradaComputer(computer)
-		elif str(message.text) == "No":
-			bot.send_message(message.chat.id, "otra vez sera")
+	print message.text
+	if str(message.text) == str("Si"):
+		bot.send_message(message.chat.id, "Empieza el juego \nPiedra, Papel, Tijera, Lagarto, Spock...",reply_markup=json_keyboard1)
+
+
+	elif str(message.text) == "No":
+		bot.send_message(message.chat.id, "otra vez sera")
+
+
 
 	#bot.send_message(message.chat.id, message.text)
 
