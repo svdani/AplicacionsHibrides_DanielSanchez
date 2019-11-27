@@ -3,6 +3,7 @@ import telebot
 import json
 from random import randrange, uniform
 from multiprocessing import Process, Value, Array
+import threading
 import os
 import sys
 reload(sys)
@@ -12,18 +13,24 @@ sys.setdefaultencoding('utf8')
 
 bot = telebot.TeleBot("571633707:AAHooMJqG3oG740HqTkCTcjj30_zKyFZCS4")
 playerId = Value('i', 0)
-json_keyboard = json.dumps({'keyboard': [["Si"],["No"]],
+#TECLADOS PERSONALIZADOS
+json_keyboard = json.dumps({'keyboard': [["Si"],["No"]],#PREGUNTA LISTO PARA EMPEZAR
 							'one_time_keyboard':True,
 							'resize_keyboard':True})
 
-json_keyboard1 = json.dumps({'keyboard': [["Piedra"],["Papel"],["Tijera"],["Lagarto"],["Spock"]],
+json_keyboard1 = json.dumps({'keyboard': [["Piedra"],["Papel"],["Tijera"],["Lagarto"],["Spock"]],#PREGUNTA TU ELECCCION
 							'one_time_keyboard':True,
 							'resize_keyboard':True})
 
+json_keyboard2 = json.dumps({'keyboard': [["Puntuacion"],["Total partidas"],["Partidas ganadas"],["Partidas empatadas"],["Partidas perdidas"],["Salir"]],#PREGUNTA TU ELECCCION
+							'one_time_keyboard':True,
+							'resize_keyboard':True})
+
+#METODO REVISA SI EXISTE EL FICHERO
 def checkFile(file_Id):
 	return os.path.isfile(str(file_Id))
-#\Funcionamient juego
 
+#\Funcionamient juego
 def tiradaComputer(plyer, randomPc, playerId,playerName):
 	#CONVIERTE RANDOM EN UNA DE LAS ELECCIONES
 
@@ -127,21 +134,57 @@ def tiradaComputer(plyer, randomPc, playerId,playerName):
 
 		documentoPl = open(str(playerId) + ".txt", "r+")
 		lectura = documentoPl.readline().split(";")
-		puntos = puntos + int(lectura[1])
+		#TOTAL PUNTOS JUGADOR
+		total = int(lectura[5])+1#TOTAL PARTIDAS JUGADAS
+		g = int(lectura[2])#TOTAL PARTIDAS GANADAS
+		e = int(lectura[3])#TOTAL PARTIDAS EMPATADAS
+		p = int(lectura[4])#TOTAL PARTIDAS PERDIDAS
+		#CHIVATO
 		print lectura[1]
-		print puntos
+		print float(puntos)
 
-		documentoPj = open(str(playerId) + ".txt", "w+")
-		documentoPj.write(playerName + ";" + str(puntos))
+		if float(puntos) == 1.0:
+			g = g + 1
+		elif float(puntos) == -1.0:
+			e = e + 1
+		elif float(puntos) == 0.5:
+			p = p + 1
+
+		documentoPj = open(str(playerId) + ".txt", "w+")#ABRE DOCUMENTO ESCRITURA
+		puntos = puntos + float(lectura[1])
+		#ESCRIBE EN EL DOCUMENTO YA EXISTENTE
+
+		documentoPj.write(playerName + ";" + str(puntos) + ";" + str(g) + ";" + str(e) + ";" + str(p) + ";"+ str(total))
 		documentoPj.close()
 	else:
 		print "NO existe"
 		documentoPj = open(str(playerId) + ".txt", "w+")
-		documentoPj.write(playerName + ";" + str(puntos))
+		#ESCRIBE EN EL DOCUMENTO SI NO EXISTE
+		if puntos == 1:
+			documentoPj.write(playerName + ";" + str(puntos) + ";1;0;0;1")
+		elif puntos == -1:
+			documentoPj.write(playerName + ";" + str(puntos) + ";0;0;1;1")
+		elif puntos == 0.5:
+			documentoPj.write(playerName + ";" + str(puntos) + ";0;1;0;1")
 		documentoPj.close()
+#FIN DEL PROCESO
+
+
+#MUESTRA PUNTUACION-------
+def verPuntuacion(plyer,playerId,playerName,posicio):
+	if checkFile(str(playerId) + ".txt") == True:
+		print "existe"
+
+		documentoPl = open(str(playerId) + ".txt", "r+")
+		lectura = documentoPl.readline().split(";")
+		Puntuacion = str(lectura[posicio])
+		return Puntuacion
+		#bot.send_message(playerId, "TINES UN TOTAL DE " + str(Puntuacion))
 
 
 
+
+#----------START BOT------------
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
@@ -153,45 +196,67 @@ def send_welcome(message):
 #\CUANDO ELIGES UN MOVIMIENTO  LLAMA AL METODO tiradaComputer LE PASA EL message(TU ELECCION), computer(RANDOM TIRADA PC), message(ID USUARIO JUGANDO)
 @bot.message_handler(regexp='Piedra')
 def elije(message):
-
 	computer = randrange(1, 6)
-	tiradaComputer(message.text,computer, message.from_user.id,message.from_user.first_name)
+	tiradaComputer(message.text, computer, message.from_user.id, message.from_user.first_name)
 
 @bot.message_handler(regexp='Papel')
 def elije(message):
-
 	computer = randrange(1, 6)
-	tiradaComputer(message.text,computer, message.from_user.id,message.from_user.first_name)
+	tiradaComputer(message.text, computer, message.from_user.id, message.from_user.first_name)
 
 @bot.message_handler(regexp='Tijera')
 def elije(message):
-
 	computer = randrange(1, 6)
-	tiradaComputer(message.text,computer, message.from_user.id,message.from_user.first_name)
+	tiradaComputer(message.text, computer, message.from_user.id, message.from_user.first_name)
 
 @bot.message_handler(regexp='Lagarto')
 def elije(message):
-
 	computer = randrange(1, 6)
-	tiradaComputer(message.text,computer, message.from_user.id,message.from_user.first_name)
+	tiradaComputer(message.text, computer, message.from_user.id, message.from_user.first_name)
 
 @bot.message_handler(regexp='Spock')
 def elije(message):
 	computer = randrange(1, 6)
-	tiradaComputer(message.text,computer, message.from_user.id,message.from_user.first_name)
+	tiradaComputer(message.text, computer, message.from_user.id, message.from_user.first_name)
 
+#\CUANDO ELIJES (NO EMPEZAR) PUEDES VISUALIZAR
+
+@bot.message_handler(regexp='Puntuacion')
+def elije(message):
+	bot.send_message(message.chat.id, "TINES UN TOTAL DE " + verPuntuacion(message.text, message.from_user.id, message.from_user.first_name,1) + " PUNTOS")
+
+@bot.message_handler(regexp='Total partidas')
+def elije(message):
+	bot.send_message(message.chat.id, "TINES UN TOTAL DE " + verPuntuacion(message.text, message.from_user.id, message.from_user.first_name,5) + " PARTIDAS JUGADAS")
+
+@bot.message_handler(regexp='Partidas ganadas')
+def elije(message):
+	bot.send_message(message.chat.id, "TINES UN TOTAL DE " + verPuntuacion(message.text, message.from_user.id, message.from_user.first_name,2) + " PARTIDAS GANADAS")
+
+@bot.message_handler(regexp='Partidas empatadas')
+def elije(message):
+	bot.send_message(message.chat.id, "TINES UN TOTAL DE " + verPuntuacion(message.text, message.from_user.id, message.from_user.first_name,3) + " PARTIDAS EMPATADAS")
+
+@bot.message_handler(regexp='Partidas perdidas')
+def elije(message):
+	bot.send_message(message.chat.id, "TINES UN TOTAL DE " + verPuntuacion(message.text, message.from_user.id, message.from_user.first_name,4) + " PARTIDAS PERDIDAS")
+
+@bot.message_handler(regexp='Salir')
+def elije(message):
+	bot.send_message(message.chat.id, "Vuelve cuando quieras  \n")
+	#tiradaComputer(message.text,computer, message.from_user.id,message.from_user.first_name)
 
 #\RESPUESTA A LA PRIMERA PREGUNTA "QUIERES JUGAR"
 @bot.message_handler(func=lambda message:True)
 def empiezaPartida(message):
-	print message.text
+	#print message.text
 	if str(message.text) == str("Si"):
-		print  message.from_user.first_name
+		#print  message.from_user.first_name
 		bot.send_message(message.chat.id, "Empieza el juego \nPiedra, Papel, Tijera, Lagarto, Spock...",reply_markup=json_keyboard1)
 
 
 	elif str(message.text) == "No":
-		bot.send_message(message.chat.id, "otra vez sera")
+		bot.send_message(message.chat.id, "Que necesitas? \n",reply_markup=json_keyboard2)
 
 
 #Para que no finalize el programa i se mantenga a la espera de mas informacion
