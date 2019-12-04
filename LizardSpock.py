@@ -10,9 +10,11 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 # randrange gives you an integral value
 
-
+#TOKEN BOT
 bot = telebot.TeleBot("571633707:AAHooMJqG3oG740HqTkCTcjj30_zKyFZCS4")
+
 playerId = Value('i', 0)
+
 #TECLADOS PERSONALIZADOS
 json_keyboard = json.dumps({'keyboard': [["Si"],["No"]],#PREGUNTA LISTO PARA EMPEZAR
 							'one_time_keyboard':True,
@@ -32,8 +34,8 @@ def checkFile(file_Id):
 
 #\Funcionamient juego
 def tiradaComputer(plyer, randomPc, playerId,playerName):
-	#CONVIERTE RANDOM EN UNA DE LAS ELECCIONES
 
+	#CONVIERTE RANDOM EN UNA DE LAS ELECCIONES
 	switcher = {
         1: "Piedra",
         2: "Papel",
@@ -51,7 +53,7 @@ def tiradaComputer(plyer, randomPc, playerId,playerName):
 
 	#---- lista possibilidades
 	if str(plyer) == movPc:
-		bot.send_message(playerId,"Empate")
+		bot.send_message(playerId,"Empate, " + movPc)
 		puntos = 0.5
 	elif str(plyer) == "Piedra":
 		if movPc == "Papel":
@@ -123,10 +125,7 @@ def tiradaComputer(plyer, randomPc, playerId,playerName):
 			puntos = 1
 			bot.send_message(playerId, "Tijera\nHas ganado")
 
-	#playerId(playerId)
 
-#-------FIN tiradaCom()puter()----
-#def playerId(playerId):
 	#GUARDA EN EL documentoPj
 
 	if checkFile(str(playerId) + ".txt") == True:
@@ -145,9 +144,9 @@ def tiradaComputer(plyer, randomPc, playerId,playerName):
 
 		if float(puntos) == 1.0:
 			g = g + 1
-		elif float(puntos) == -1.0:
-			e = e + 1
 		elif float(puntos) == 0.5:
+			e = e + 1
+		elif float(puntos) == -1.0:
 			p = p + 1
 
 		documentoPj = open(str(playerId) + ".txt", "w+")#ABRE DOCUMENTO ESCRITURA
@@ -186,12 +185,16 @@ def verPuntuacion(plyer,playerId,playerName,posicio):
 
 #----------START BOT------------
 
-@bot.message_handler(commands=['start', 'help'])
+@bot.message_handler(commands=['start'])
 def send_welcome(message):
 	bot.send_message(message.chat.id, "Bienvenido, Estas listo? ",reply_markup=json_keyboard)
 	playerId.value = message.from_user.id
-#\nEmpieza el juego \nPiedra, Papel, Tijera, Lagarto, Spock...""
+#\nEmpieza el juego Piedra, Papel, Tijera, Lagarto, Spock...""
+@bot.message_handler(commands=['help'])
+def send_welcome(message):
+	bot.send_message(message.chat.id, "Hola Bienvenido veo que necesitas ayuda \nEste es el juego Piedra, Papel, Tijera, Lagarto, Spock\n  \n/start <-- para empezar \n Si quieres jugar elige SI, sino elige NO y puedes ver tus puntuaciones o salir y jugar otro dia")
 
+#\nEmpieza el juego Piedra, Papel, Tijera, Lagarto, Spock...""
 
 #\CUANDO ELIGES UN MOVIMIENTO  LLAMA AL METODO tiradaComputer LE PASA EL message(TU ELECCION), computer(RANDOM TIRADA PC), message(ID USUARIO JUGANDO)
 @bot.message_handler(regexp='Piedra')
@@ -244,14 +247,13 @@ def elije(message):
 @bot.message_handler(regexp='Salir')
 def elije(message):
 	bot.send_message(message.chat.id, "Vuelve cuando quieras  \n")
-	#tiradaComputer(message.text,computer, message.from_user.id,message.from_user.first_name)
 
-#\RESPUESTA A LA PRIMERA PREGUNTA "QUIERES JUGAR"
+
+#\RESPUESTA A LA PRIMERA PREGUNTA "QUIERES JUGAR? si/no"
 @bot.message_handler(func=lambda message:True)
 def empiezaPartida(message):
-	#print message.text
+
 	if str(message.text) == str("Si"):
-		#print  message.from_user.first_name
 		bot.send_message(message.chat.id, "Empieza el juego \nPiedra, Papel, Tijera, Lagarto, Spock...",reply_markup=json_keyboard1)
 
 
