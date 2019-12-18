@@ -20,11 +20,11 @@ json_keyboard = json.dumps({'keyboard': [["Si"],["No"]],#PREGUNTA LISTO PARA EMP
 							'one_time_keyboard':True,
 							'resize_keyboard':True})
 
-json_keyboard1 = json.dumps({'keyboard': [["Piedra"],["Papel"],["Tijera"],["Lagarto"],["Spock"]],#PREGUNTA TU ELECCCION
-							'one_time_keyboard':True,
+json_keyboard1 = json.dumps({'keyboard': [["Piedra"],["Papel"],["Tijera"],["Lagarto"],["Spock"],["Ver Puntuacion"],["Salir"]],#PREGUNTA TU ELECCCION
+							'one_time_keyboard':False,
 							'resize_keyboard':True})
 
-json_keyboard2 = json.dumps({'keyboard': [["Puntuacion"],["Total partidas"],["Partidas ganadas"],["Partidas empatadas"],["Partidas perdidas"],["Salir"]],#PREGUNTA TU ELECCCION
+json_keyboard2 = json.dumps({'keyboard': [["Puntuacion"],["Total partidas"],["Partidas ganadas"],["Partidas empatadas"],["Partidas perdidas"],["Jugar"],["Salir"]],#PREGUNTA TU ELECCCION
 							'one_time_keyboard':True,
 							'resize_keyboard':True})
 
@@ -187,14 +187,18 @@ def verPuntuacion(plyer,playerId,playerName,posicio):
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-	bot.send_message(message.chat.id, "Bienvenido, Estas listo? ",reply_markup=json_keyboard)
+	bot.send_message(message.chat.id, "Bienvenido\n/help <-- Si necesitas ayuda \nEstas listo? ",reply_markup=json_keyboard)
 	playerId.value = message.from_user.id
-#\nEmpieza el juego Piedra, Papel, Tijera, Lagarto, Spock...""
+
 @bot.message_handler(commands=['help'])
 def send_welcome(message):
-	bot.send_message(message.chat.id, "Hola Bienvenido veo que necesitas ayuda \nEste es el juego Piedra, Papel, Tijera, Lagarto, Spock\n  \n/start <-- para empezar \n Si quieres jugar elige SI, sino elige NO y puedes ver tus puntuaciones o salir y jugar otro dia")
+	bot.send_message(message.chat.id, "Hola Bienvenido veo que necesitas ayuda \nEste es el juego Piedra, Papel, Tijera, Lagarto, Spock\n  \n/start <-- para empezar \n Si quieres jugar elige SI, sino elige NO y puedes ver tus puntuaciones o salir y jugar otro dia\n--------------------------------------\nPiedra aplasta Lagarto\nLagarto envenena Spock\nSpock rompe tijera\nTijera corta papel\nPapel envuelve piedra\nPapel desautoriza Spock\nTijera decapita lagarto\nSpock vaporiza piedra\nLagarto devora papel\nPiedra aplasta tijera \n /view <-- para verlo mejor")
 
-#\nEmpieza el juego Piedra, Papel, Tijera, Lagarto, Spock...""
+@bot.message_handler(commands=['view'])
+def send_welcome(message):
+	bot.send_photo(message.chat.id, photo=open('image.png'))
+	bot.send_message(message.chat.id, "Bienvenido\n/help <-- Si necesitas ayuda \nEstas listo? ",reply_markup=json_keyboard)
+	playerId.value = message.from_user.id
 
 #\CUANDO ELIGES UN MOVIMIENTO  LLAMA AL METODO tiradaComputer LE PASA EL message(TU ELECCION), computer(RANDOM TIRADA PC), message(ID USUARIO JUGANDO)
 @bot.message_handler(regexp='Piedra')
@@ -222,6 +226,10 @@ def elije(message):
 	computer = randrange(1, 6)
 	tiradaComputer(message.text, computer, message.from_user.id, message.from_user.first_name)
 
+@bot.message_handler(regexp='Ver Puntuacion')
+def elije(message):
+	bot.send_message(message.chat.id, "Que necesitas? \n",reply_markup=json_keyboard2)
+
 #\CUANDO ELIJES (NO EMPEZAR) PUEDES VISUALIZAR
 
 @bot.message_handler(regexp='Puntuacion')
@@ -243,6 +251,10 @@ def elije(message):
 @bot.message_handler(regexp='Partidas perdidas')
 def elije(message):
 	bot.send_message(message.chat.id, "TINES UN TOTAL DE " + verPuntuacion(message.text, message.from_user.id, message.from_user.first_name,4) + " PARTIDAS PERDIDAS")
+
+@bot.message_handler(regexp='Jugar')
+def elije(message):
+	bot.send_message(message.chat.id, "Empieza el juego \nPiedra, Papel, Tijera, Lagarto, Spock...",reply_markup=json_keyboard1)
 
 @bot.message_handler(regexp='Salir')
 def elije(message):
